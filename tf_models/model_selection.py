@@ -11,7 +11,7 @@ import tensorflow as tf
 from tensorflow.keras.preprocessing.text import Tokenizer
 from tensorflow.keras.preprocessing.sequence import pad_sequences
 from tensorflow.keras.models import Sequential
-from tensorflow.keras.layers import Embedding, Conv1D, GlobalMaxPooling1D, Dense, Dropout
+from tensorflow.keras.layers import Embedding, Conv1D, GlobalMaxPooling1D, Dense, Dropout, LSTM, Flatten
 from tensorflow.keras.callbacks import EarlyStopping
 from tensorflow.keras.optimizers import Adam
 
@@ -50,7 +50,7 @@ Train Time
 """
 
 
-def train(remove_stop_words, remove_punctuations, to_lower, vocab_size, embedding_dim, sentence_length_threshold, learning_rate, verbose = False):
+def train(model_type, remove_stop_words, remove_punctuations, to_lower, vocab_size, embedding_dim, sentence_length_threshold, learning_rate, verbose = False):
     
     trunc_type='post'
     padding_type='post'
@@ -129,15 +129,39 @@ def train(remove_stop_words, remove_punctuations, to_lower, vocab_size, embeddin
     testing_padded = np.array(testing_padded)
     testing_labels = np.array(testing_labels)
 
+    if model_type == "cnn":
+        
+        model = Sequential([
+            Embedding(vocab_size, embedding_dim),
+            Conv1D(16, 1, activation='relu'),
+            GlobalMaxPooling1D(),
+            Dense(8, activation='relu'),
+            Dropout(0.5),
+            Dense(1, activation='sigmoid')
+        ])
+        
+    if model_type == "lstm":
+        
+        model = Sequential([
+            Embedding(vocab_size, embedding_dim),
+            LSTM(16, return_sequences=False),
+            Dense(8, activation='relu'),
+            Dropout(0.5),
+            Dense(1, activation='sigmoid')
+        ])
 
-    model = Sequential([
-        Embedding(vocab_size, embedding_dim),
-        Conv1D(16, 1, activation='relu'),
-        GlobalMaxPooling1D(),
-        Dense(8, activation='relu'),
-        Dropout(0.5),
-        Dense(1, activation='sigmoid')
-    ])
+        
+    if model_type == "dense":
+        
+        model = Sequential([
+            Embedding(vocab_size, embedding_dim),
+            Flatten(),
+            Dense(16, activation='relu'),
+            Dense(8, activation='relu'),
+            Dropout(0.5),
+            Dense(1, activation='sigmoid')
+        ])
+     
 
     model.compile(loss=loss_function, optimizer=optimizer, metrics=[train_metric])
 
