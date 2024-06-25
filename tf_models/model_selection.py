@@ -28,8 +28,6 @@ embedding_dim = 64
 sentence_length_threshold = -1
 learning_rate = 0.0005
 
-Model Architecture = ??
-
 ------CONSTANT------
 trunc_type='post'
 padding_type='post'
@@ -38,6 +36,7 @@ loss_function = binary_cross_entropy
 train_metric = Accuracy
 epoch = 30
 early_stopping_patience = 3
+Model Architecture
 
 -----METRICS-----
 Train Accuracy
